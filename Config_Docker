@@ -1,0 +1,79 @@
+- Install Docker on Ubuntu Server
+
+    $ sudo apt-get update 
+
+    # Setup Hostname
+    sudo hostnamectl set-hostname "sonarqubeServer"
+
+    # Update the hostname part of Host File
+    echo "`hostname -I | awk '{ print $1 }'` `hostname`" >> /etc/hosts
+
+    # Update Ubuntu Repository
+    sudo apt-get update
+
+    # Download, & Install Utility Softwares
+    sudo apt-get install git wget unzip zip curl tree -y
+
+    $ sudo apt-get install docker.io -y
+
+    # Enable Docker For Ubuntu User
+    sudo usermod -aG docker ubuntu
+
+    # Grant Access Docker Socket
+    sudo chmod 777 /var/run/docker.sock
+
+    # Enable Docker Services at boot level
+    sudo systemctl enable docker
+
+    # Restart Docker Daemon 
+    sudo systemctl restart docker
+
+- Download a Docker Image of Sonarqube from hub.docker.com
+
+    $ sudo docker pull sonarqube
+
+
+- check Downloaded Docker Image of Sonarqube
+
+    $ sudo docker images
+
+- Create Docker volumes to store the SonarQube persistent data.
+
+    $ docker volume create sonarqube-conf
+
+    $ docker volume create sonarqube-data
+
+    $ docker volume create sonarqube-logs
+
+    $ docker volume create sonarqube-extensions
+
+
+- Verify the persistent data directories.
+
+    $ docker volume inspect sonarqube-conf
+
+    $ docker volume inspect sonarqube-data
+
+    $ docker volume inspect sonarqube-logs
+
+    $ docker volume inspect sonarqube-extensions
+
+
+- Optionally, create symbolic links to an easier access location.
+
+
+    $ mkdir /sonarqube
+
+
+    $ ln -s /var/lib/docker/volumes/sonarqube-conf/_data /sonarqube/conf
+
+    $ ln -s /var/lib/docker/volumes/sonarqube-data/_data /sonarqube/data
+
+    $ ln -s /var/lib/docker/volumes/sonarqube-logs/_data /sonarqube/logs
+
+    $ ln -s /var/lib/docker/volumes/sonarqube-extensions/_data /sonarqube/extensions
+
+
+- Start a SonarQube container with persistent data storage.
+
+    $ docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 -v sonarqube-conf:/sonarqube/conf -v sonarqube-data:/sonarqube/data -v sonarqube-logs:/sonarqube/logs -v sonarqube-extensions:/sonarqube/extensions sonarqube
